@@ -12,6 +12,7 @@ class Faculty{
         // constructors and destructor
         Faculty();
         Faculty(unsigned int id1, string name1, string level1, string department1);
+        // Faculty(string fileLine); // add later maybe?
         ~Faculty();
 
         // accessors and mutators

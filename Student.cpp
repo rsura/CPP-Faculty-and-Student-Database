@@ -95,27 +95,27 @@ unsigned int Student::getAdvisorId(){
 }
 
 bool operator==(Student& lhs, Student& rhs){
-
+    return (lhs.getId() == rhs.getId());
 }
 
 bool operator!=(Student& lhs, Student& rhs){
-
+    return (lhs.getId() != rhs.getId());
 }
 
 bool operator>=(Student& lhs, Student& rhs){
-
+    return (lhs.getId() >= rhs.getId());
 }
 
 bool operator<=(Student& lhs, Student& rhs){
-
+    return (lhs.getId() <= rhs.getId());
 }
 
 bool operator>(Student& lhs, Student& rhs){
-
+    return (lhs.getId() > rhs.getId());
 }
 
 bool operator<(Student& lhs, Student& rhs){
-
+    return (lhs.getId() < rhs.getId());
 }
 
 ostream& operator<<(ostream& os, Student& stud){
@@ -141,7 +141,7 @@ ostream& operator<<(ostream& os, Student& stud){
         os << "|" << setw(20) << right << "Major: " << "(NOT SET)" << endl;
     }
     try{
-        os << "|" << setw(20) << right << "GPA: " << stud.getGpa() << endl;
+        os << "|" << setw(20) << right << "GPA: " << fixed << setprecision(2) << stud.getGpa() << resetiosflags(ios::showbase) << endl;
     } catch (runtime_error &e){
         os << "|" << setw(20) << right << "GPA: " << "(NOT SET)" << endl;
     }

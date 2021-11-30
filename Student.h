@@ -12,6 +12,7 @@ class Student{
         // constructors and destructor
         Student();
         Student(unsigned int id1, string name1, string level1, string major1, double gpa1, unsigned int advisorId1);
+        // Student(string fileLine); // add later maybe?
         ~Student();
 
         // accessors and mutators
