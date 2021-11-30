@@ -6,13 +6,14 @@ using namespace std;
 
 template <class T>
 class TreeNode{
-    TreeNode();
-    TreeNode(T key);
-    virtual ~TreeNode();
+    public:
+        TreeNode();
+        TreeNode(T key);
+        ~TreeNode();
 
-    T key; // key = data
-    TreeNode<T> *left;
-    TreeNode<T> *right;
+        T key; // key = data
+        TreeNode<T> *left;
+        TreeNode<T> *right;
 };
 
 template <class T>

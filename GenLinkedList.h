@@ -328,7 +328,7 @@ void GenLinkedList<T>::print(){
     ListNode<T> *curr = front;
     ostringstream listString;
     while(curr->next != NULL){
-        listString << curr->data << ", ";
+        listString << curr->data << endl;
         curr = curr->next;
     }
     listString << curr->data;
@@ -347,7 +347,7 @@ void GenLinkedList<T>::printReverse(){
     ListNode<T> *curr = back;
     ostringstream listString;
     while(curr->prev != NULL){
-        listString << curr->data << ", ";
+        listString << curr->data << endl;
         curr = curr->prev;
     }
     listString << curr->data;
