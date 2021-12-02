@@ -1,9 +1,19 @@
+/**
+ * Header File: Simulation.h
+ *
+ * Full Name: Rahul Sura
+ * Student ID: 2371308
+ * Chapman email: sura@chapman.edu
+ * Course: CPSC 350-03
+ * Assignment: Assignment 6
+ */
+
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
 #include "Faculty.h"
 #include "Student.h"
-#include "RollbackStack.h"
+#include "Rollback.h"
 
 using namespace std;
 
@@ -29,6 +39,8 @@ class Simulation{
         bool removeFacultyAdvisee();
         bool rollbackLastChange();
         void saveAndQuit();
+
+        void removeCommas(string& s); // helper method
 
         // BSTs of students and faculty
         BST<Student> *masterStudent;
