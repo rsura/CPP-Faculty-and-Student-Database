@@ -1,3 +1,13 @@
+/**
+ * Implementation File: Faculty.cpp
+ *
+ * Full Name: Rahul Sura
+ * Student ID: 2371308
+ * Chapman email: sura@chapman.edu
+ * Course: CPSC 350-03
+ * Assignment: Assignment 6
+ */
+ 
 #include "Faculty.h"
 
 using namespace std;

@@ -1,3 +1,13 @@
+/**
+ * Header File: Faculty.h
+ *
+ * Full Name: Rahul Sura
+ * Student ID: 2371308
+ * Chapman email: sura@chapman.edu
+ * Course: CPSC 350-03
+ * Assignment: Assignment 6
+ */
+ 
 #ifndef FACULTY_H
 #define FACULTY_H
 
