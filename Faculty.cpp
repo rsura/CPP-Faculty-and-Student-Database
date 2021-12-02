@@ -7,7 +7,7 @@
  * Course: CPSC 350-03
  * Assignment: Assignment 6
  */
- 
+
 #include "Faculty.h"
 
 using namespace std;
@@ -41,7 +41,8 @@ Faculty::Faculty(unsigned int id1, string name1, string level1, string departmen
 }
 
 /**
- * Overloaded constructor - creates a faculty member from a string of values
+ * Overloaded constructor - creates a faculty member from a string of values. Throws a
+ * runtime_error if the string of values are not properly set.
  *
  * @param a string in comma separated values of the faculty member's attributes
  */
@@ -50,96 +51,69 @@ Faculty::Faculty(string fileLine){
     advisees = new GenLinkedList<unsigned int>();
     FileProcessor *fp = new FileProcessor();
     string tempStrValue = fp->nextValueInString(fileLine, ",");
-    try{
-        removeCommas(tempStrValue);
+    try{ // setting ID
         int tempId = stoi(tempStrValue);
         if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is a negative number.");
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is a negative number.\nFailed to create faculty member record.");
         }
         setId(tempId);
     } catch (out_of_range &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is too large to be an ID.") << endl;
-        cerr << "Failed to create Faculty member record." << endl;
-        delete fp;
-        return;
+        throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is too large to be an ID.\nFailed to create faculty member record.");
     } catch (invalid_argument &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is not a valid number.") << endl;
-        cerr << "Failed to create Faculty member record." << endl;
-        delete fp;
-        return;
+        throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is not a valid number.\nFailed to create faculty member record.");
     } catch (runtime_error &e){
-        cerr << e.what() << endl;
-        cerr << "Failed to create Faculty member record." << endl;
         delete fp;
-        return;
+        throw runtime_error(e.what());
     }
 
     tempStrValue = fp->nextValueInString(fileLine, ",");
-    try{
-        removeCommas(tempStrValue);
+    try{ // setting name
         if(fp->isEmptyString(tempStrValue)){
-            throw runtime_error("ERROR: No name specified in the database for this faculty member");
+            throw runtime_error("ERROR: No name specified in the database for this faculty member.\nFailed to create faculty member record.");
         }
         setName(tempStrValue);
     } catch (runtime_error &e){
-        cerr << e.what() << endl;
-        cerr << "Failed to create Faculty member record." << endl;
         delete fp;
-        return;
+        throw runtime_error(e.what());
     }
 
     tempStrValue = fp->nextValueInString(fileLine, ",");
-    try{
-        removeCommas(tempStrValue);
+    try{ // setting level
         if(fp->isEmptyString(tempStrValue)){
-            throw runtime_error("ERROR: No level specified in the database for this faculty member");
+            throw runtime_error("ERROR: No level specified in the database for this faculty member.\nFailed to create faculty member record.");
         }
         setLevel(tempStrValue);
     } catch (runtime_error &e){
-        cerr << e.what() << endl;
-        cerr << "Failed to create Faculty member record." << endl;
         delete fp;
-        return;
+        throw runtime_error(e.what());
     }
 
     tempStrValue = fp->nextValueInString(fileLine, ",");
-    try{
-        removeCommas(tempStrValue);
+    try{ // setting department
         if(fp->isEmptyString(tempStrValue)){
-            throw runtime_error("ERROR: No department specified in the database for this faculty member");
+            throw runtime_error("ERROR: No department specified in the database for this faculty member.\nFailed to create faculty member record.");
         }
         setDepartment(tempStrValue);
     } catch (runtime_error &e){
-        cerr << e.what() << endl;
-        cerr << "Failed to create Faculty member record." << endl;
         delete fp;
-        return;
+        throw runtime_error(e.what());
     }
 
     while (fileLine != "") {
         tempStrValue = fp->nextValueInString(fileLine, ",");
-        try{
-            removeCommas(tempStrValue);
+        try{ // setting advisee ID
             int tempId = stoi(tempStrValue);
             if (tempId <= 0) {
-                throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is a negative number.");
+                throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is a negative number.\nFailed to create faculty member record.");
             }
             addAdvisee(tempId);
-        } catch (out_of_range &e){ // takes care of out_of_range, invalid_argument, and runtime_error
-            cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is too large to be an ID.") << endl;
-            cerr << "Failed to create Faculty member record." << endl;
-            delete fp;
-            return;
+        } catch (out_of_range &e){
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is too large to be an ID.\nFailed to create faculty member record.");
         } catch (invalid_argument &e){
-            cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is not a valid number.") << endl;
-            cerr << "Failed to create Faculty member record." << endl;
-            delete fp;
-            return;
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is not a valid number.\nFailed to create faculty member record.");
         } catch (runtime_error &e){
-            cerr << e.what() << endl;
-            cerr << "Failed to create Faculty member record." << endl;
             delete fp;
-            return;
+            throw runtime_error(e.what());
         }
     }
 
@@ -391,22 +365,31 @@ ostream& operator<<(ostream& os, Faculty*& fac){
 }
 
 /**
- * Operator overloading for >>
+ * Operator overloading for >>, to get a csv of the faculty member's info
  *
  * @param a faculty member
  * @param an ostream like std::cout
  * @return the same ostream that was passed in
  */
 ostream& operator>>(Faculty& fac, ostream& os){
+    try{
+        fac.getId();
+        fac.getName();
+        fac.getLevel();
+        fac.getDepartment();
+    } catch (exception &e){
+        return os;
+    }
     os << fac.getId() << ", " << fac.getName() << ", " << fac.getLevel() << ", " << fac.getDepartment();
     if (fac.getAdviseeIds() != "") {
         os << ", " << fac.getAdviseeIds();
     }
+    os << endl;
     return os;
 }
 
 /**
- * Operator overloading for >>
+ * Operator overloading for >>, to get a csv of the faculty member's info
  *
  * @param a pointer to a faculty member object
  * @param an ostream like std::cout
@@ -415,17 +398,4 @@ ostream& operator>>(Faculty& fac, ostream& os){
 ostream& operator>>(Faculty*& fac, ostream& os){
     *fac >> os;
     return os;
-}
-
-/**
- * Helper function - removes commas in a string passed by reference
- *
- * @param any string. If the string has no commas, nothing will be modified
- */
-void Faculty::removeCommas(string& s){
-    for (int i = 0; i < s.length(); i++) { // remove potential commas in the integer, since db stores it as csv
-        if (s[i] == ',') {
-            s = s.substr(0,i) + s.substr(i+1);
-        }
-    }
 }

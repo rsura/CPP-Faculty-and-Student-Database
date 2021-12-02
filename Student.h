@@ -1,8 +1,19 @@
-#ifndef STUDENT_H
+/**
+ * Header File: Student.h
+ *
+ * Full Name: Rahul Sura
+ * Student ID: 2371308
+ * Chapman email: sura@chapman.edu
+ * Course: CPSC 350-03
+ * Assignment: Assignment 6
+ */
+
+#ifndef STUDENT_H // header guards
 #define STUDENT_H
 
 #include "GenLinkedList.h"
-#include "BST.h"
+#include "bst.h"
+#include "FileProcessor.h"
 #include <iomanip>
 
 using namespace std;
@@ -11,8 +22,8 @@ class Student{
     public:
         // constructors and destructor
         Student();
-        Student(unsigned int id1, string name1, string level1, string major1, double gpa1, unsigned int advisorId1);
-        // Student(string fileLine); // add later maybe?
+        Student(unsigned int id1, string name1 = "", string level1 = "", string major1 = "", double gpa1 = 0, unsigned int advisorId1 = 0);
+        Student(string fileLine); // IMPLEMENT
         ~Student();
 
         // accessors and mutators
@@ -26,7 +37,7 @@ class Student{
         string getMajor();
         void setGpa(double gpa1);
         double getGpa();
-        void setAdvisorId(unsigned int advisorId1); // prompt that they want to change the advisor if already existing advisor ID
+        void setAdvisorId(unsigned int advisorId1);
         unsigned int getAdvisorId();
 
         // Overloaded operators
@@ -36,8 +47,10 @@ class Student{
         friend bool operator<=(Student& lhs, Student& rhs);
         friend bool operator>(Student& lhs, Student& rhs);
         friend bool operator<(Student& lhs, Student& rhs);
-        friend ostream& operator<<(ostream& os, Student& fac);
-        friend ostream& operator<<(ostream& os, Student*& fac);
+        friend ostream& operator<<(ostream& os, Student& stud);
+        friend ostream& operator<<(ostream& os, Student*& stud);
+        friend ostream& operator>>(Student& stud, ostream& os); // IMPLEMENT
+        friend ostream& operator>>(Student*& stud, ostream& os);
 
     private:
         unsigned int id;

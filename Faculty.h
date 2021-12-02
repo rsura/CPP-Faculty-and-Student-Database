@@ -7,8 +7,8 @@
  * Course: CPSC 350-03
  * Assignment: Assignment 6
  */
- 
-#ifndef FACULTY_H
+
+#ifndef FACULTY_H // header guards
 #define FACULTY_H
 
 #include "GenLinkedList.h"
@@ -53,7 +53,6 @@ class Faculty{
         friend ostream& operator>>(Faculty*& fac, ostream& os);
 
     private:
-        void removeCommas(string& s); // helper method
         unsigned int id;
         string name;
         string level;
