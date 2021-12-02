@@ -1,13 +1,23 @@
-#ifndef BST_H
+/**
+ * Header and Implementation File: bst.h
+ *
+ * Full Name: Rahul Sura
+ * Student ID: 2371308
+ * Chapman email: sura@chapman.edu
+ * Course: CPSC 350-03
+ * Assignment: Assignment 6
+ */
+
+#ifndef BST_H // header guards
 #define BST_H
 #include <iostream>
 
 using namespace std;
 
-template <class T>
+template<typename T> // template class because you can make list nodes of different types. However, it won't always properly work with T of pointer type
 class TreeNode{
     public:
-        TreeNode();
+        TreeNode(); // default constructor - shouldn't be used in general but is there in case
         TreeNode(T key);
         ~TreeNode();
 
@@ -16,6 +26,9 @@ class TreeNode{
         TreeNode<T> *right;
 };
 
+/**
+ * Default constructor - creates an empty tree node
+ */
 template <class T>
 TreeNode<T>::TreeNode(){
     left = NULL;
@@ -23,6 +36,10 @@ TreeNode<T>::TreeNode(){
     key = NULL;
 }
 
+/**
+ * Overloaded constructor - creates a new tree node with the provided data
+ * @param the data to be added into the tree
+ */
 template <class T>
 TreeNode<T>::TreeNode(T k){
     left = NULL;
@@ -30,43 +47,86 @@ TreeNode<T>::TreeNode(T k){
     key = k;
 }
 
+/**
+ * Destructor
+ */
 template <class T>
 TreeNode<T>::~TreeNode(){
+    // nulls out the node's left and right pointers and deletes them, so that it's separated before deletion
     left = NULL;
+    delete left;
     right = NULL;
+    delete right;
 }
 
-template <class T>
+// -------------------------------------BST-------------------------------------
+
+template <class T> // template class because you can make list nodes of different types. However, it won't always properly work with T of pointer type
 class BST{
     public:
         BST();
         virtual ~BST();
         void insert(T value);
         bool contains(T value); // search
+        T* find(T value);
         bool deleteNode(T k);
         bool isEmpty();
         T* getMin();
         T* getMax();
         void printNodes();
     private:
+        void recDelete(TreeNode<T> *node);
         void recPrint(TreeNode<T> *node);
         TreeNode<T> *getSuccessor(TreeNode<T> *d); //d represents the node we are going to delete
         TreeNode<T> *root;
 };
 
+/**
+ * Default constructor - creates an empty BST
+ */
 template <class T>
 BST<T>::BST(){
     root = NULL;
 }
 
+/**
+ * Destructor
+ */
 template <class T>
 BST<T>::~BST(){
-    // IMPLEMENT LATER
-
+    recDelete(root);
+    root = NULL; // nulls out the root, in case it's not nulled out already, to indicate the tree is empty
+    delete root;
 }
 
+/**
+ * Helper function - recursively deletes the BST in postorder from a certain node,
+ * but used for the destructor to delete the whole tree
+ *
+ * @param the starting node of the tree that needs to be deleted from
+ */
 template <class T>
-void BST<T>::recPrint(TreeNode<T> *node){
+void BST<T>::recDelete(TreeNode<T> *node){ // post order delete, so that no treenodes are orphaned
+    if (node == NULL) {
+        return;
+    }
+    if (node->left != NULL) {
+        recDelete(node->left);
+    }
+    if (node->right != NULL) {
+        recDelete(node->right);
+    }
+    delete node;
+}
+
+/**
+ * Helper function - recursively prints the nodes of the BST from a certain node inorder,
+ * but used by the printNodes() method to print all the nodes of the tree
+ *
+ * @param the node of the tree that needs to be printed from
+ */
+template <class T>
+void BST<T>::recPrint(TreeNode<T> *node){ // inorder printing
     if(node == NULL){
         return;
     }
@@ -75,41 +135,63 @@ void BST<T>::recPrint(TreeNode<T> *node){
     recPrint(node->right);
 }
 
+/**
+ * Prints the nodes of the BST inorder, separated by line
+ */
 template <class T>
-/* this function prints the entire tree */
 void BST<T>::printNodes(){
-    recPrint(root);
+    recPrint(root); // printing inorder with the helper function
 }
 
+/**
+ * Checks if the tree is empty or not
+ *
+ * @return a bool representing if the tree is empty or not
+ */
 template <class T>
 bool BST<T>::isEmpty(){
     return (root == NULL);
 }
 
+/**
+ * Gets the minimum value from the tree
+ *
+ * @return a pointer to the minimum value of the tree
+ */
 template <class T>
 T* BST<T>::getMin(){
     if(isEmpty()){
         return NULL;
     }
     TreeNode<T> *current = root;
-    while(current->left != NULL){
+    while(current->left != NULL){ // left most value is the smallest
         current = current->left;
     }
     return &(current->key);
 }
 
+/**
+ * Gets the maximum value from the tree
+ *
+ * @return a pointer to the maximum value of the tree
+ */
 template <class T>
 T* BST<T>::getMax(){
     if(isEmpty()){
         return NULL;
     }
     TreeNode<T> *current = root;
-    while(current->right != NULL){
+    while(current->right != NULL){ // right most value is the smallest
         current = current->right;
     }
     return &(current->key);
 }
 
+/**
+ * Inserts a new node with the provided value
+ *
+ * @param value to be inserted
+ */
 template<class T>
 void BST<T>::insert(T value){
     TreeNode<T> *node = new TreeNode<T>(value);
@@ -141,18 +223,24 @@ void BST<T>::insert(T value){
     }
 }
 
+/**
+ * Checks if the tree contains a certain value
+ *
+ * @param value to be checked in the tree
+ * @return a bool representing if the tree contains the value
+ */
 template<class T>
 bool BST<T>::contains(T value){
     if(isEmpty()){
         return false;
     }
 
-    TreeNode<T> *current = root;
+    TreeNode<T> *current = root; // tree node pointer to a possible value
     while(current->key != value){
         if(value < current->key){
             current = current->left;
         } else {
-            value = current->right;
+            current = current->right;
         }
 
         if(current == NULL){
@@ -163,6 +251,37 @@ bool BST<T>::contains(T value){
     return true;
 }
 
+/**
+ * Checks if the tree contains a certain value and returns a pointer to the value
+ * if found. Returns NULL if not found
+ *
+ * @param value to be found in the tree
+ * @return a pointer to the found value of the tree. Returns NULL if value not found
+ */
+template<class T>
+T* BST<T>::find(T value){
+    if (!contains(value)) { // if tree doesn't have the value, returns null
+        return NULL;
+    }
+
+    TreeNode<T> *current = root;
+    while(current->key != value){
+        if(value < current->key){
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+
+    return &(current->key); // reference to the key of the treenode
+}
+
+/**
+ * Deletes a node, given a certain value
+ *
+ * @param value to be deleted in the tree
+ * @return a bool representing if the node was successfully deleted or not.
+ */
 template <class T>
 bool BST<T>::deleteNode(T k){
     if(isEmpty()){
@@ -233,6 +352,13 @@ bool BST<T>::deleteNode(T k){
     return true;
 }
 
+/**
+ * Helper function - gets the TreeNode pointer that has the nearest value to
+ * the right of the passed in node
+ *
+ * @param a TreeNode pointer to find the successor of
+ * @return a TreeNode pointer to representing the successor
+ */
 template <class T>
 TreeNode<T>* BST<T>::getSuccessor(TreeNode<T> *d){
     TreeNode<T> *sp /*(successor's parent)*/ = d;
