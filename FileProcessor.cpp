@@ -150,7 +150,11 @@ bool FileProcessor::isEmptyString(string& name){
  * @return a string representing the next value of the string before the delimiter
  */
 string FileProcessor::nextValueInString(string& s, string delimiter){
-    isEmptyString(s); // trims trailing and leading spaces
+    if (isEmptyString(s)) { // trims trailing and leading spaces
+        s = "";
+        string nextValue = s;
+        return nextValue;
+    }
     int index = -1;
     for (int i = 0; i < (s.length() - delimiter.length()); i++) {
         if (s.substr(i, delimiter.length()) == delimiter) {
@@ -160,7 +164,11 @@ string FileProcessor::nextValueInString(string& s, string delimiter){
     }
     if (index > -1) {
         string nextValue = s.substr(0,index);
-        s = s.substr(nextValue.length() + delimiter.length());
+        if (nextValue.length() + delimiter.length() >= s.length()) {
+            s = "";
+        } else {
+            s = s.substr(nextValue.length() + delimiter.length());
+        }
         isEmptyString(nextValue);
         return nextValue;
     }
