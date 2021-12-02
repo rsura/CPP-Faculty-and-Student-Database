@@ -17,7 +17,7 @@
 
 using namespace std;
 
-template<typename T> // template class because you can make list nodes of different types
+template<typename T> // template class because you can make list nodes of different types. However, it won't always properly work with T of pointer type
 class ListNode{
     public:
         ListNode(); // default constructor - shouldn't be used in general but is there in case
@@ -33,7 +33,10 @@ class ListNode{
  * Default constructor - creates an empty list node
  */
 template<typename T>
-ListNode<T>::ListNode(){}
+ListNode<T>::ListNode(){
+    prev = NULL;
+    next = NULL;
+}
 
 /**
  * Overloaded constructor - creates a new list node with the provided data
@@ -41,9 +44,9 @@ ListNode<T>::ListNode(){}
  */
 template<typename T>
 ListNode<T>::ListNode(T d){
-    data = d;
-    next = NULL;
     prev = NULL;
+    next = NULL;
+    data = d;
 }
 
 /**
@@ -60,7 +63,7 @@ ListNode<T>::~ListNode(){
 
 // --------------------------GenLinkedList--------------------------------------
 
-template<typename T> // template class because you can make linked lists of different types
+template<typename T> // template class because you can make list nodes of different types. However, it won't always properly work with T of pointer type
 class GenLinkedList{
     public:
         GenLinkedList();
@@ -75,6 +78,7 @@ class GenLinkedList{
         void sort();
         void print();
         void printReverse();
+        string getListString();
         bool isEmpty();
         unsigned int getSize();
     private:
@@ -191,7 +195,7 @@ T GenLinkedList<T>::removeFront(){
         front->next->prev = NULL;
     }
     front = front->next; // reassigns front pointer
-    temp->next == NULL;
+    temp->next = NULL;
     T data = temp->data;
     --size;
     delete temp;
@@ -215,7 +219,7 @@ T GenLinkedList<T>::removeBack(){
         back->prev->next = NULL;
     }
     back = back->prev; // reassigns back pointer
-    temp->prev == NULL;
+    temp->prev = NULL;
     T data = temp->data;
     --size;
     delete temp;
@@ -352,6 +356,26 @@ void GenLinkedList<T>::printReverse(){
     }
     listString << curr->data;
     cout << listString.str() << endl;
+}
+
+/**
+ * Returns a string of the elements as comma separated values instead of printing it
+ *
+ * @return a string representing the list
+ */
+template<typename T>
+string GenLinkedList<T>::getListString(){
+    if(size == 0){
+        return "";
+    }
+    ListNode<T> *curr = front;
+    ostringstream listString;
+    while(curr->next != NULL){
+        listString << curr->data << ", ";
+        curr = curr->next;
+    }
+    listString << curr->data;
+    return listString.str();
 }
 
 /**
