@@ -142,6 +142,35 @@ bool FileProcessor::isEmptyString(string& name){
 }
 
 /**
+ * Returns the next value in a string before a delimiter. Modifies the passed string by reference
+ * from the first delimiter onwards and returns the first part of the string.
+ *
+ * @param string with delimiters
+ * @param string representing the delimiter
+ * @return a string representing the next value of the string before the delimiter
+ */
+string FileProcessor::nextValueInString(string& s, string delimiter){
+    isEmptyString(s); // trims trailing and leading spaces
+    int index = -1;
+    for (int i = 0; i < (s.length() - delimiter.length()); i++) {
+        if (s.substr(i, delimiter.length()) == delimiter) {
+            index = i;
+            break;
+        }
+    }
+    if (index > -1) {
+        string nextValue = s.substr(0,index);
+        s = s.substr(nextValue.length() + delimiter.length());
+        isEmptyString(nextValue);
+        return nextValue;
+    }
+
+    string nextValue = s;
+    s = "";
+    return nextValue;
+}
+
+/**
  * Checks if the file being read from has reached the end. If the
  * read file hasn't been declared to be opened, then it will throw an error
  *
