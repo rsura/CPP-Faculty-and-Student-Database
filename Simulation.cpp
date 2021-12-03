@@ -212,24 +212,12 @@ void Simulation::printStudent(){
     string tempStrValue;
     getline(cin, tempStrValue);
     try{
-        FileProcessor fp;
-        if (fp.isEmptyString(tempStrValue)) {
-            throw runtime_error("ERROR: No value for student ID provided.");
-        }
-        int tempId = stoi(tempStrValue);
-        if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's info, because it is a negative number or zero.");
-        }
-        unsigned int referenceId = tempId;
+        unsigned int referenceId = getValidId(tempStrValue);
         if (masterStudent->contains(Student(referenceId))) {
             cout << *(masterStudent->find(Student(referenceId))) << endl;
         } else {
             cerr << "ERROR: No student found with the ID: \"" << referenceId << "\"" << endl;
         }
-    } catch (out_of_range &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's info, because it is too large to be an ID.") << endl;
-    } catch (invalid_argument &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's info, because it is not a valid number.") << endl;
     } catch (runtime_error &e){
         cerr << e.what() << endl;
     }
@@ -246,24 +234,12 @@ void Simulation::printFaculty(){
     string tempStrValue;
     getline(cin, tempStrValue);
     try{
-        FileProcessor fp;
-        if (fp.isEmptyString(tempStrValue)) {
-            throw runtime_error("ERROR: No value for faculty ID provided.");
-        }
-        int tempId = stoi(tempStrValue);
-        if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is a negative number or zero.");
-        }
-        unsigned int referenceId = tempId;
+        unsigned int referenceId = getValidId(tempStrValue);
         if (masterFaculty->contains(Faculty(referenceId))) {
             cout << *(masterFaculty->find(Faculty(referenceId))) << endl;
         } else {
             cerr << "ERROR: No faculty member found with the ID: \"" << referenceId << "\"" << endl;
         }
-    } catch (out_of_range &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is too large to be an ID.") << endl;
-    } catch (invalid_argument &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is not a valid number.") << endl;
     } catch (runtime_error &e){
         cerr << e.what() << endl;
     }
@@ -280,15 +256,7 @@ void Simulation::printStudAdvisor(){
     string tempStrValue;
     getline(cin, tempStrValue);
     try{
-        FileProcessor fp;
-        if (fp.isEmptyString(tempStrValue)) {
-            throw runtime_error("ERROR: No value for student ID provided.");
-        }
-        int tempId = stoi(tempStrValue);
-        if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's advisor's info, because it is a negative number or zero.");
-        }
-        unsigned int referenceId = tempId;
+        unsigned int referenceId = getValidId(tempStrValue);
         if (masterStudent->contains(Student(referenceId))) {
             unsigned int advisorId = (masterStudent->find(Student(referenceId)))->getAdvisorId();
             if (masterFaculty->contains(Faculty(advisorId))) {
@@ -301,10 +269,6 @@ void Simulation::printStudAdvisor(){
         } else {
             cerr << "ERROR: No student found with the ID: \"" << referenceId << "\"" << endl;
         }
-    } catch (out_of_range &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's advisor's info, because it is too large to be an ID.") << endl;
-    } catch (invalid_argument &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's advisor's info, because it is not a valid number.") << endl;
     } catch (runtime_error &e){
         cerr << e.what() << endl;
     }
@@ -321,15 +285,7 @@ void Simulation::printFacultyAdvisees(){
     string tempStrValue;
     getline(cin, tempStrValue);
     try{
-        FileProcessor fp;
-        if (fp.isEmptyString(tempStrValue)) {
-            throw runtime_error("ERROR: No value for faculty ID provided.");
-        }
-        int tempId = stoi(tempStrValue);
-        if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is a negative number or zero.");
-        }
-        unsigned int referenceId = tempId;
+        unsigned int referenceId = getValidId(tempStrValue);
         if (masterFaculty->contains(Faculty(referenceId))) {
             cout << "Printing info of all advisees of faculty member with ID #" << referenceId << endl;
             usleep(500000);
@@ -345,10 +301,6 @@ void Simulation::printFacultyAdvisees(){
         } else {
             cerr << "ERROR: No faculty member found with the ID: \"" << referenceId << "\"" << endl;
         }
-    } catch (out_of_range &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is too large to be an ID.") << endl;
-    } catch (invalid_argument &e){
-        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is not a valid number.") << endl;
     } catch (runtime_error &e){
         cerr << e.what() << endl;
     }
@@ -388,8 +340,25 @@ void Simulation::saveAndQuit(){
     usleep(500000);
 }
 
-unsigned int Simulation::getValidUnsignedInt(){
-    
+unsigned int Simulation::getValidId(string s){
+    try{
+        FileProcessor fp;
+        if (fp.isEmptyString(s)) {
+            throw runtime_error("ERROR: No value for ID provided.");
+        }
+        int tempId = stoi(s);
+        if (tempId <= 0) {
+            throw runtime_error("ERROR: " + s + " is a zero or negative number.");
+        }
+        unsigned int referenceId = tempId;
+        return referenceId;
+    } catch (out_of_range &e){
+        throw runtime_error("ERROR: " + s + " is too large to be an ID.");
+    } catch (invalid_argument &e){
+        throw runtime_error("ERROR: " + s + " is not a valid number.");
+    } catch (runtime_error &e){
+        throw runtime_error(e.what());
+    }
 }
 
 /**

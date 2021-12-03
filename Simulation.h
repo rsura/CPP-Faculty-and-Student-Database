@@ -42,7 +42,7 @@ class Simulation{
         void saveAndQuit();
 
          // helper method
-        unsigned int getValidUnsignedInt();
+        unsigned int getValidId(string s);
         void displayOptions();
         void setUp();
         void removeCommas(string& s);
