@@ -32,16 +32,17 @@ class Simulation{
         void printFaculty();
         void printStudAdvisor();
         void printFacultyAdvisees();
-        bool addNewStudent();
-        bool deleteStudent();
-        bool addNewFaculty();
-        bool deleteFaculty();
-        bool changeStudAdvisor();
-        bool removeFacultyAdvisee();
-        bool rollbackLastChange();
+        void addNewStudent();
+        void deleteStudent();
+        void addNewFaculty();
+        void deleteFaculty();
+        void changeStudAdvisor();
+        void removeFacultyAdvisee();
+        void rollbackLastChange();
         void saveAndQuit();
 
          // helper method
+        unsigned int getValidUnsignedInt();
         void displayOptions();
         void setUp();
         void removeCommas(string& s);

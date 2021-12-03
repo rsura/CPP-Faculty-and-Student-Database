@@ -128,6 +128,7 @@ void Simulation::setUp(){
                 if (!masterStudent->contains(s1) && masterFaculty->contains(Faculty(s1.getAdvisorId()))) {
                     masterStudent->insert(s1);
                     (masterFaculty->find(Faculty(s1.getAdvisorId())))->addAdvisee(s1.getId());
+                    // *(masterFaculty->find(Faculty(s1.getAdvisorId()))) >> cout;
                 }
             } catch (runtime_error &e){
                 // fail quietly. We don't need error message on start up if the file has incorrect lines
@@ -270,44 +271,125 @@ void Simulation::printFaculty(){
 }
 
 void Simulation::printStudAdvisor(){
-
+    if (masterStudent->isEmpty()) {
+        cout << "Student database is empty. It wouldn't be possible to print any student's advisor's information." << endl;
+        usleep(1000000);
+        return;
+    }
+    cout << "What is the ID of the student that you would like to print their advisor's info of?\n--->\t";
+    string tempStrValue;
+    getline(cin, tempStrValue);
+    try{
+        FileProcessor fp;
+        if (fp.isEmptyString(tempStrValue)) {
+            throw runtime_error("ERROR: No value for student ID provided.");
+        }
+        int tempId = stoi(tempStrValue);
+        if (tempId <= 0) {
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's advisor's info, because it is a negative number or zero.");
+        }
+        unsigned int referenceId = tempId;
+        if (masterStudent->contains(Student(referenceId))) {
+            unsigned int advisorId = (masterStudent->find(Student(referenceId)))->getAdvisorId();
+            if (masterFaculty->contains(Faculty(advisorId))) {
+                cout << "Printing the advisor info of the student with ID #" << referenceId << endl;
+                usleep(500000);
+                cout << *(masterFaculty->find(Faculty(advisorId))) << endl;
+            } else { // shouldn't happen if program is used properly, but there in case
+                throw runtime_error("ERROR: Student's advisor doesn't exist in the faculty database.");
+            }
+        } else {
+            cerr << "ERROR: No student found with the ID: \"" << referenceId << "\"" << endl;
+        }
+    } catch (out_of_range &e){
+        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's advisor's info, because it is too large to be an ID.") << endl;
+    } catch (invalid_argument &e){
+        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the student's advisor's info, because it is not a valid number.") << endl;
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+    }
+    usleep(1000000);
 }
 
 void Simulation::printFacultyAdvisees(){
+    if (masterFaculty->isEmpty()) {
+        cout << "Faculty database is empty. It wouldn't be possible to print any faculty member's information." << endl;
+        usleep(1000000);
+        return;
+    }
+    cout << "What is the ID of the faculty member that you would like to print all of their advisee's info of?\n--->\t";
+    string tempStrValue;
+    getline(cin, tempStrValue);
+    try{
+        FileProcessor fp;
+        if (fp.isEmptyString(tempStrValue)) {
+            throw runtime_error("ERROR: No value for faculty ID provided.");
+        }
+        int tempId = stoi(tempStrValue);
+        if (tempId <= 0) {
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is a negative number or zero.");
+        }
+        unsigned int referenceId = tempId;
+        if (masterFaculty->contains(Faculty(referenceId))) {
+            cout << "Printing info of all advisees of faculty member with ID #" << referenceId << endl;
+            usleep(500000);
+            GenLinkedList<unsigned int> advisees = masterFaculty->find(Faculty(referenceId))->getAllAdvisees();
+            for (int i = 0; i < advisees.getSize(); ++i) {
+                unsigned int studId = *(advisees.returnData(i));
+                if (masterStudent->contains(studId)) {
+                    cout << *(masterStudent->find(studId)) << endl;
+                } else {
+                    masterFaculty->find(Faculty(referenceId))->removeAdvisee(studId);
+                }
+            }
+        } else {
+            cerr << "ERROR: No faculty member found with the ID: \"" << referenceId << "\"" << endl;
+        }
+    } catch (out_of_range &e){
+        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is too large to be an ID.") << endl;
+    } catch (invalid_argument &e){
+        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to print the faculty member's info, because it is not a valid number.") << endl;
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+    }
+    usleep(1000000);
+}
+
+void Simulation::addNewStudent(){
 
 }
 
-bool Simulation::addNewStudent(){
-    return true; // temporary
+void Simulation::deleteStudent(){
+
 }
 
-bool Simulation::deleteStudent(){
-    return true; // temporary
+void Simulation::addNewFaculty(){
+
 }
 
-bool Simulation::addNewFaculty(){
-    return true; // temporary
+void Simulation::deleteFaculty(){
+
 }
 
-bool Simulation::deleteFaculty(){
-    return true; // temporary
+void Simulation::changeStudAdvisor(){
+
 }
 
-bool Simulation::changeStudAdvisor(){
-    return true; // temporary
+void Simulation::removeFacultyAdvisee(){
+
 }
 
-bool Simulation::removeFacultyAdvisee(){
-    return true; // temporary
-}
+void Simulation::rollbackLastChange(){
 
-bool Simulation::rollbackLastChange(){
-    return true; // temporary
 }
 
 void Simulation::saveAndQuit(){
     cout << "Exiting program. Thank you." << endl;
-    usleep(1000000);
+    usleep(500000);
+}
+
+unsigned int Simulation::getValidUnsignedInt(){
+    
 }
 
 /**
