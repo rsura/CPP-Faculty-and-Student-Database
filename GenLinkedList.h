@@ -75,6 +75,7 @@ class GenLinkedList{
         T removeBack();
         T removeNode(int pos); // removes and returns the node from a certain position
         int find(T value); // finds the position of a certain value
+        T* returnData(int pos);
         void sort();
         void print();
         void printReverse();
@@ -295,6 +296,29 @@ int GenLinkedList<T>::find(T value){
         curr = curr->next;
     }
     return -1;
+}
+
+/**
+ * Finds the data from the given position
+ *
+ * @param an int representing the position of the node to get information from
+ * @return data with the linked list's data type
+ */
+template<typename T>
+T* GenLinkedList<T>::returnData(int pos){
+    if(pos < 0 || pos >= getSize()){
+        throw runtime_error("ERROR: Invalid list position!");
+    }
+    int currPos = 0;
+    ListNode<T> *curr = front;
+    while (currPos < pos) {
+        curr = curr->next;
+        ++currPos;
+    }
+    if (curr == NULL) {
+        return NULL;
+    }
+    return &(curr->data);
 }
 
 /**

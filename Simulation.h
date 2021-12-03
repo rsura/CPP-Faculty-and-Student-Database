@@ -14,6 +14,7 @@
 #include "Faculty.h"
 #include "Student.h"
 #include "Rollback.h"
+#include <unistd.h> // includes micro sleep function (usleep)
 
 using namespace std;
 
@@ -40,7 +41,10 @@ class Simulation{
         bool rollbackLastChange();
         void saveAndQuit();
 
-        void removeCommas(string& s); // helper method
+         // helper method
+        void displayOptions();
+        void setUp();
+        void removeCommas(string& s);
 
         // BSTs of students and faculty
         BST<Student> *masterStudent;
