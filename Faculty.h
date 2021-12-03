@@ -57,7 +57,7 @@ class Faculty{
         string name;
         string level;
         string department;
-        GenLinkedList<unsigned int> *advisees;
+        GenLinkedList<unsigned int> advisees;
 };
 
 #endif

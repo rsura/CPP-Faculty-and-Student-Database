@@ -20,7 +20,7 @@ Faculty::Faculty(){
     setName("");
     setLevel("");
     setDepartment("");
-    advisees = new GenLinkedList<unsigned int>();
+    // advisees = new GenLinkedList<unsigned int>();
 }
 
 /**
@@ -37,7 +37,7 @@ Faculty::Faculty(unsigned int id1, string name1, string level1, string departmen
     setName(name1);
     setLevel(level1);
     setDepartment(department1);
-    advisees = new GenLinkedList<unsigned int>();
+    // advisees = new GenLinkedList<unsigned int>();
 }
 
 /**
@@ -48,13 +48,13 @@ Faculty::Faculty(unsigned int id1, string name1, string level1, string departmen
  */
 Faculty::Faculty(string fileLine){
     id = 0; // in case the setter for id is weird because the int has not been defined yet
-    advisees = new GenLinkedList<unsigned int>();
+    // advisees = new GenLinkedList<unsigned int>();
     FileProcessor *fp = new FileProcessor();
     string tempStrValue = fp->nextValueInString(fileLine, ",");
     try{ // setting ID
         int tempId = stoi(tempStrValue);
         if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is a negative number.\nFailed to create faculty member record.");
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is a negative number or zero.\nFailed to create faculty member record.");
         }
         setId(tempId);
     } catch (out_of_range &e){
@@ -99,24 +99,6 @@ Faculty::Faculty(string fileLine){
         throw runtime_error(e.what());
     }
 
-    while (fileLine != "") {
-        tempStrValue = fp->nextValueInString(fileLine, ",");
-        try{ // setting advisee ID
-            int tempId = stoi(tempStrValue);
-            if (tempId <= 0) {
-                throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is a negative number.\nFailed to create faculty member record.");
-            }
-            addAdvisee(tempId);
-        } catch (out_of_range &e){
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is too large to be an ID.\nFailed to create faculty member record.");
-        } catch (invalid_argument &e){
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add an advisee ID for this faculty member, because it is not a valid number.\nFailed to create faculty member record.");
-        } catch (runtime_error &e){
-            delete fp;
-            throw runtime_error(e.what());
-        }
-    }
-
     delete fp;
 }
 
@@ -124,7 +106,7 @@ Faculty::Faculty(string fileLine){
  * Destructor
  */
 Faculty::~Faculty(){
-    delete advisees;
+    // delete advisees;
 }
 
 /**
@@ -220,8 +202,10 @@ string Faculty::getDepartment(){
  * @param an unsigned int representing the ID of the student to be added
  */
 void Faculty::addAdvisee(unsigned int studId){
-    advisees->insertBack(studId);
-    advisees->sort();
+    if (advisees.find(studId) >= 0) {
+        advisees.insertBack(studId);
+        advisees.sort();
+    }
 }
 
 /**
@@ -230,10 +214,10 @@ void Faculty::addAdvisee(unsigned int studId){
  * @param an unsigned int representing the ID of the student to be removed
  */
 bool Faculty::removeAdvisee(unsigned int studId){
-    if (advisees->find(studId) < 0) {
+    if (advisees.find(studId) < 0) {
         return false;
     }
-    advisees->removeNode(advisees->find(studId));
+    advisees.removeNode(advisees.find(studId));
     return true;
 }
 
@@ -243,7 +227,7 @@ bool Faculty::removeAdvisee(unsigned int studId){
  * @param a string representing the IDs of the advisees, in a comma separated value format
  */
 string Faculty::getAdviseeIds(){
-    return advisees->getListString();
+    return advisees.getListString();
 }
 
 /**

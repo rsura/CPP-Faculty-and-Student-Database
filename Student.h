@@ -23,7 +23,7 @@ class Student{
         // constructors and destructor
         Student();
         Student(unsigned int id1, string name1 = "", string level1 = "", string major1 = "", double gpa1 = 0, unsigned int advisorId1 = 0);
-        Student(string fileLine); // IMPLEMENT
+        Student(string fileLine);
         ~Student();
 
         // accessors and mutators
@@ -49,7 +49,7 @@ class Student{
         friend bool operator<(Student& lhs, Student& rhs);
         friend ostream& operator<<(ostream& os, Student& stud);
         friend ostream& operator<<(ostream& os, Student*& stud);
-        friend ostream& operator>>(Student& stud, ostream& os); // IMPLEMENT
+        friend ostream& operator>>(Student& stud, ostream& os);
         friend ostream& operator>>(Student*& stud, ostream& os);
 
     private:

@@ -57,7 +57,7 @@ Student::Student(string fileLine){
     try{ // setting ID
         int tempId = stoi(tempStrValue);
         if (tempId <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this student, because it is a negative number.\nFailed to create student record.");
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this student, because it is a negative number or zero.\nFailed to create student record.");
         }
         setId(tempId);
     } catch (out_of_range &e){
@@ -105,12 +105,12 @@ Student::Student(string fileLine){
     tempStrValue = fp->nextValueInString(fileLine, ",");
     try{ // setting GPA
         double tempGpa = stod(tempStrValue);
-        if (tempGpa <= 0) {
-            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is a negative number.\nFailed to create student record.");
+        if (tempGpa < 0 || tempGpa > 4.0) {
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because student's gpa has to be set within the range of: 0 ≤ GPA ≤ 4.00.\nFailed to create student record.");
         }
         setGpa(tempGpa);
     } catch (out_of_range &e){
-        throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is too large to be an ID.\nFailed to create student record.");
+        throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is too large to be a GPA.\nFailed to create student record.");
     } catch (invalid_argument &e){
         throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is not a valid number.\nFailed to create student record.");
     } catch (runtime_error &e){
