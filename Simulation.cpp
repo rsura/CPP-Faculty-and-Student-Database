@@ -312,7 +312,33 @@ void Simulation::addNewStudent(){
 }
 
 void Simulation::deleteStudent(){
+    if (masterStudent->isEmpty()) {
+        cout << "Student database is empty. It wouldn't be possible to delete any student from the database." << endl;
+        usleep(1000000);
+        return;
+    }
+    cout << "What is the ID of the student that you would like to delete?\n--->\t";
+    string tempStrValue;
+    getline(cin, tempStrValue);
+    try{
+        unsigned int referenceId = getValidId(tempStrValue);
+        if (masterStudent->contains(Student(referenceId))) {
+            unsigned int studAdvisor = masterStudent->find(Student(referenceId))->getAdvisorId();
+            masterStudent->deleteNode(Student(referenceId));
+            cout << "Success! Deleted the student with ID #" << referenceId << endl;
+            usleep(500000);
+            if (masterFaculty->contains(Faculty(studAdvisor))) {
+                masterFaculty->find(Faculty(studAdvisor))->removeAdvisee(referenceId);
+                cout << "Also, removed the student from the list of the advisees for the advisor with ID #" << studAdvisor << endl;
+            }
 
+        } else {
+            cerr << "ERROR: No student found in the databse with the ID: \"" << referenceId << "\"" << endl;
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+    }
+    usleep(1000000);
 }
 
 void Simulation::addNewFaculty(){
@@ -320,7 +346,60 @@ void Simulation::addNewFaculty(){
 }
 
 void Simulation::deleteFaculty(){
+    if (masterFaculty->isEmpty()) {
+        cout << "Faculty database is empty. It wouldn't be possible to delete any faculty member from the database." << endl;
+        usleep(1000000);
+        return;
+    }
+    cout << "What is the ID of the faculty member that you would like to delete?\n--->\t";
+    string tempStrValue;
+    getline(cin, tempStrValue);
+    unsigned int deletingFacultyId;
+    try{
+        deletingFacultyId = getValidId(tempStrValue);
+        if (!masterFaculty->contains(Faculty(deletingFacultyId))) {
+            string s = "ERROR: No faculty member found in the databse with the ID: \"" + to_string(deletingFacultyId) + "\"";
+            throw runtime_error(s);
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
 
+    cout << "Now that faculty member with ID #" << deletingFacultyId << " is going to be deleted, their advisees need a new advisor." << endl;
+    cout << "What is the ID of the faculty member that you would like to replace all their advisees' advisor for?\n--->\t";
+    getline(cin, tempStrValue);
+    unsigned int newFacultyId;
+    try{
+        newFacultyId = getValidId(tempStrValue);
+        if (deletingFacultyId == newFacultyId) {
+            throw runtime_error("ERROR: The two faculty IDs that you inputted are the same.");
+        }
+        if (!masterFaculty->contains(Faculty(newFacultyId))) {
+            string s = "ERROR: No faculty member found in the databse with the ID: \"" + to_string(newFacultyId) + "\" to replace faculty member with ID#" + to_string(deletingFacultyId);
+            s += "\nWill not delete Faculty member with ID #" + to_string(deletingFacultyId);
+            throw runtime_error(s);
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+
+    GenLinkedList<unsigned int> replaceAdvisors = masterFaculty->find(Faculty(deletingFacultyId))->getAllAdvisees();
+    for (int i = 0; i < replaceAdvisors.getSize(); ++i) {
+        unsigned int tempId = *(replaceAdvisors.returnData(i));
+        if (masterStudent->contains(Student(tempId))) {
+            masterStudent->find(tempId)->setAdvisorId(newFacultyId);
+            masterFaculty->find(newFacultyId)->addAdvisee(tempId);
+        }
+    }
+    masterFaculty->deleteNode(Faculty(deletingFacultyId));
+    cout << "Success! Deleted faculty member with ID #" << to_string(deletingFacultyId) << " and transfered their advisees to faculty member with ID #" << to_string(newFacultyId) << endl;
+
+
+    usleep(1000000);
 }
 
 void Simulation::changeStudAdvisor(){

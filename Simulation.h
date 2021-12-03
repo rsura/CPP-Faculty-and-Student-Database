@@ -41,7 +41,7 @@ class Simulation{
         void rollbackLastChange();
         void saveAndQuit();
 
-         // helper method
+        // helper methods
         unsigned int getValidId(string s);
         void displayOptions();
         void setUp();
