@@ -202,7 +202,7 @@ string Faculty::getDepartment(){
  * @param an unsigned int representing the ID of the student to be added
  */
 void Faculty::addAdvisee(unsigned int studId){
-    if (advisees.find(studId) >= 0) {
+    if (advisees.find(studId) < 0) {
         advisees.insertBack(studId);
         advisees.sort();
     }
@@ -228,6 +228,14 @@ bool Faculty::removeAdvisee(unsigned int studId){
  */
 string Faculty::getAdviseeIds(){
     return advisees.getListString();
+}
+
+GenLinkedList<unsigned int> Faculty::getAllAdvisees(){
+    GenLinkedList<unsigned int> toBeReturned;
+    for (int i = 0; i < advisees.getSize(); ++i) {
+        toBeReturned.insertBack(*advisees.returnData(i));
+    }
+    return toBeReturned;
 }
 
 /**

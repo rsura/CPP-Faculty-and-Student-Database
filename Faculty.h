@@ -39,6 +39,7 @@ class Faculty{
         void addAdvisee(unsigned int studId);
         bool removeAdvisee(unsigned int studId);
         string getAdviseeIds();
+        GenLinkedList<unsigned int> getAllAdvisees();
 
         // Overloaded operators
         friend bool operator==(Faculty& lhs, Faculty& rhs);

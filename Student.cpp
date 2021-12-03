@@ -376,6 +376,13 @@ ostream& operator<<(ostream& os, Student& stud){
     } catch (runtime_error &e){
         os << "|" << setw(20) << right << "GPA: " << "(NOT SET)" << endl;
     }
+
+    try{
+        stud.getAdvisorId();
+        os << "|" << setw(20) << right << "Advisor's ID: " << stud.getAdvisorId() << endl;
+    } catch (runtime_error &e){
+        os << "|" << setw(20) << right << "Advisor's ID: " << "(NOT SET)" << endl;
+    }
     os << setfill('-') << setw(41) << "" << endl;
     os << setfill(' ');
 
