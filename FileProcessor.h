@@ -28,9 +28,9 @@ class FileProcessor{
         string getNextLine();
         void write(string line); // printing a string to the file without going to the next line
         void writeLine(string line); // printing a string to the file
-        bool isEmptyString(string& name); // if the string taken is empty
-        string nextValueInString(string& s, string delimiter);
         bool eof(); // if the file has reached the end
+        static bool isEmptyString(string& name); // if the string taken is empty
+        static string nextValueInString(string& s, string delimiter);
     private:
         string readFileName;
         string writeFileName;

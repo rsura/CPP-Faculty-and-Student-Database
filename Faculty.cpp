@@ -49,8 +49,7 @@ Faculty::Faculty(unsigned int id1, string name1, string level1, string departmen
 Faculty::Faculty(string fileLine){
     id = 0; // in case the setter for id is weird because the int has not been defined yet
     // advisees = new GenLinkedList<unsigned int>();
-    FileProcessor *fp = new FileProcessor();
-    string tempStrValue = fp->nextValueInString(fileLine, ",");
+    string tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting ID
         int tempId = stoi(tempStrValue);
         if (tempId <= 0) {
@@ -62,44 +61,39 @@ Faculty::Faculty(string fileLine){
     } catch (invalid_argument &e){
         throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this faculty member, because it is not a valid number.\nFailed to create faculty member record.");
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting name
-        if(fp->isEmptyString(tempStrValue)){
+        if(FileProcessor::isEmptyString(tempStrValue)){
             throw runtime_error("ERROR: No name specified in the database for this faculty member.\nFailed to create faculty member record.");
         }
         setName(tempStrValue);
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting level
-        if(fp->isEmptyString(tempStrValue)){
+        if(FileProcessor::isEmptyString(tempStrValue)){
             throw runtime_error("ERROR: No level specified in the database for this faculty member.\nFailed to create faculty member record.");
         }
         setLevel(tempStrValue);
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting department
-        if(fp->isEmptyString(tempStrValue)){
+        if(FileProcessor::isEmptyString(tempStrValue)){
             throw runtime_error("ERROR: No department specified in the database for this faculty member.\nFailed to create faculty member record.");
         }
         setDepartment(tempStrValue);
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    delete fp;
 }
 
 /**

@@ -52,8 +52,7 @@ Student::Student(unsigned int id1, string name1, string level1, string major1, d
  */
 Student::Student(string fileLine){
     id = 0; // in case the setter for id is weird because the int has not been defined yet
-    FileProcessor *fp = new FileProcessor();
-    string tempStrValue = fp->nextValueInString(fileLine, ",");
+    string tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting ID
         int tempId = stoi(tempStrValue);
         if (tempId <= 0) {
@@ -65,44 +64,40 @@ Student::Student(string fileLine){
     } catch (invalid_argument &e){
         throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to create an ID for this student, because it is not a valid number.\nFailed to create student record.");
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting name
-        if(fp->isEmptyString(tempStrValue)){
+        if(FileProcessor::isEmptyString(tempStrValue)){
             throw runtime_error("ERROR: No name specified in the database for this student.\nFailed to create student record.");
         }
         setName(tempStrValue);
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting level
-        if(fp->isEmptyString(tempStrValue)){
+        if(FileProcessor::isEmptyString(tempStrValue)){
             throw runtime_error("ERROR: No level specified in the database for this student.\nFailed to create student record.");
         }
         setLevel(tempStrValue);
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting major
-        if(fp->isEmptyString(tempStrValue)){
+        if(FileProcessor::isEmptyString(tempStrValue)){
             throw runtime_error("ERROR: No major specified in the database for this student.\nFailed to create student record.");
         }
         setMajor(tempStrValue);
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting GPA
         double tempGpa = stod(tempStrValue);
         if (tempGpa < 0 || tempGpa > 4.0) {
@@ -114,11 +109,10 @@ Student::Student(string fileLine){
     } catch (invalid_argument &e){
         throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is not a valid number.\nFailed to create student record.");
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    tempStrValue = fp->nextValueInString(fileLine, ",");
+    tempStrValue = FileProcessor::nextValueInString(fileLine, ",");
     try{ // setting advisor ID
         int tempAdvisorId = stoi(tempStrValue);
         if (tempAdvisorId <= 0) {
@@ -130,11 +124,9 @@ Student::Student(string fileLine){
     } catch (invalid_argument &e){
         throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is not a valid number.\nFailed to create student record.");
     } catch (runtime_error &e){
-        delete fp;
         throw runtime_error(e.what());
     }
 
-    delete fp;
 }
 
 /**
