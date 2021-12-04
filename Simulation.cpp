@@ -403,6 +403,7 @@ void Simulation::addNewStudent(){
         masterStudent->insert(s1);
         cout << "Success! Added a new student with the following info:" << endl;
         cout << s1 << endl;
+        masterFaculty->find(Faculty(newFacultyId))->addAdvisee(newStudId);
     } catch (exception &e){
         cerr << "ERROR: Something went wrong when trying to create a new faculty member." << endl;
     }
