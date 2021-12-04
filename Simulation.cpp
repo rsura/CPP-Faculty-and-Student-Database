@@ -29,9 +29,8 @@ void Simulation::run(){
         displayOptions();
         string selectedOption;
         getline(cin, selectedOption);
-        FileProcessor fp;
         int optionNumber;
-        if (fp.isEmptyString(selectedOption)) {
+        if (FileProcessor::isEmptyString(selectedOption)) {
             cerr << "ERROR: No input. Instructions will be repeated again." << endl;
             continue;
         } else {
@@ -308,7 +307,106 @@ void Simulation::printFacultyAdvisees(){
 }
 
 void Simulation::addNewStudent(){
+    unsigned int newFacultyId;
+    unsigned int newStudId;
+    string newName;
+    string newLevel;
+    string newMajor;
+    double newGpa;
+    string tempStrValue;
 
+    cout << "Creating a new student. Please follow the following prompts." << endl;
+    usleep(500000);
+
+    cout << "What is the ID of the advisor that this student is going to be under?\n--->\t";
+    getline(cin, tempStrValue);
+    FileProcessor::isEmptyString(tempStrValue);
+    try{
+        newFacultyId = getValidId(tempStrValue);
+        if (!masterFaculty->contains(Faculty(newFacultyId))) {
+            string s = "ERROR: No faculty member with the ID: \"" + to_string(newFacultyId) + "\" found in the database.";
+            throw runtime_error(s);
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        cerr << "Terminating student creation." << endl;
+        usleep(1000000);
+        return;
+    }
+
+    cout << "New student's ID:\n--->\t";
+    getline(cin, tempStrValue);
+    FileProcessor::isEmptyString(tempStrValue);
+    try{
+        newStudId = getValidId(tempStrValue);
+        if (masterStudent->contains(Student(newStudId))) {
+            string s = "ERROR: Student with the ID: \"" + to_string(newStudId) + "\" already exists in the database.";
+            throw runtime_error(s);
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        cerr << "Terminating student creation." << endl;
+        usleep(1000000);
+        return;
+    }
+
+    cout << "New student's name:\n--->\t";
+    getline(cin, newName);
+    if (FileProcessor::isEmptyString(newName)) {
+        cerr << "ERROR: Empty string provided for name.\nFailed to create student." << endl;
+        usleep(1000000);
+        return;
+    }
+    removeCommas(newName);
+
+    cout << "New student's level:\n--->\t";
+    getline(cin, newLevel);
+    if (FileProcessor::isEmptyString(newLevel)) {
+        cerr << "ERROR: Empty string provided for level.\nFailed to create student." << endl;
+        usleep(1000000);
+        return;
+    }
+    removeCommas(newLevel);
+
+    cout << "New student's major:\n--->\t";
+    getline(cin, newMajor);
+    if (FileProcessor::isEmptyString(newMajor)) {
+        cerr << "ERROR: Empty string provided for major.\nFailed to create student." << endl;
+        usleep(1000000);
+        return;
+    }
+    removeCommas(newMajor);
+
+    cout << "New student's GPA:\n--->\t";
+    getline(cin, tempStrValue);
+    try{
+        newGpa = stod(tempStrValue);
+        if (newGpa < 0 || newGpa > 4.0) {
+            throw runtime_error("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because student's gpa has to be set within the range of: 0 ≤ GPA ≤ 4.00.\nFailed to create student record.");
+        }
+    } catch (out_of_range &e){
+        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is too large to be a GPA.\nFailed to create student record.") << endl;
+        usleep(1000000);
+        return;
+    } catch (invalid_argument &e){
+        cerr << ("ERROR: Can't use your input of \"" + tempStrValue + "\" to add a GPA for this student, because it is not a valid number.\nFailed to create student record.") << endl;
+        usleep(1000000);
+        return;
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+
+    try{
+        Student s1(newStudId, newName, newLevel, newMajor, newGpa, newFacultyId);
+        masterStudent->insert(s1);
+        cout << "Success! Added a new student with the following info:" << endl;
+        cout << s1 << endl;
+    } catch (exception &e){
+        cerr << "ERROR: Something went wrong when trying to create a new faculty member." << endl;
+    }
+    usleep(1000000);
 }
 
 void Simulation::deleteStudent(){
@@ -342,6 +440,66 @@ void Simulation::deleteStudent(){
 }
 
 void Simulation::addNewFaculty(){
+    unsigned int newFacultyId;
+    string newName;
+    string newLevel;
+    string newDepartment;
+    string tempStrValue;
+
+    cout << "Creating a new faculty member. Please follow the following prompts." << endl;
+    usleep(500000);
+    cout << "New faculty member's ID:\n--->\t";
+    getline(cin, tempStrValue);
+    FileProcessor::isEmptyString(tempStrValue);
+    try{
+        newFacultyId = getValidId(tempStrValue);
+        if (masterFaculty->contains(Faculty(newFacultyId))) {
+            string s = "ERROR: Faculty member with the ID: \"" + to_string(newFacultyId) + "\" already exists in the database.";
+            throw runtime_error(s);
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        cerr << "Terminating faculty member creation." << endl;
+        usleep(1000000);
+        return;
+    }
+
+    cout << "New faculty member's name:\n--->\t";
+    getline(cin, newName);
+    if (FileProcessor::isEmptyString(newName)) {
+        cerr << "ERROR: Empty string provided for name.\nFailed to create faculty member." << endl;
+        usleep(1000000);
+        return;
+    }
+    removeCommas(newName);
+
+    cout << "New faculty member's level:\n--->\t";
+    getline(cin, newLevel);
+    if (FileProcessor::isEmptyString(newLevel)) {
+        cerr << "ERROR: Empty string provided for level.\nFailed to create faculty member." << endl;
+        usleep(1000000);
+        return;
+    }
+    removeCommas(newLevel);
+
+    cout << "New faculty member's department:\n--->\t";
+    getline(cin, newDepartment);
+    if (FileProcessor::isEmptyString(newDepartment)) {
+        cerr << "ERROR: Empty string provided for department.\nFailed to create faculty member." << endl;
+        usleep(1000000);
+        return;
+    }
+    removeCommas(newDepartment);
+
+    try{
+        Faculty f1(newFacultyId, newName, newLevel, newDepartment);
+        masterFaculty->insert(f1);
+        cout << "Success! Added a new faculty member with the following info:" << endl;
+        cout << f1 << endl;
+    } catch (exception &e){
+        cerr << "ERROR: Something went wrong when trying to create a new faculty member." << endl;
+    }
+    usleep(1000000);
 
 }
 
@@ -367,6 +525,14 @@ void Simulation::deleteFaculty(){
         return;
     }
 
+    GenLinkedList<unsigned int> replaceAdvisors = masterFaculty->find(Faculty(deletingFacultyId))->getAllAdvisees();
+    if (replaceAdvisors.getSize() == 0) {
+        masterFaculty->deleteNode(Faculty(deletingFacultyId));
+        cout << "Success! Deleted faculty member with ID #" << to_string(deletingFacultyId) << ". Since they have no dependent advisees, no students will be affected by this deletion." << endl;
+        usleep(1000000);
+        return;
+    }
+
     cout << "Now that faculty member with ID #" << deletingFacultyId << " is going to be deleted, their advisees need a new advisor." << endl;
     cout << "What is the ID of the faculty member that you would like to replace all their advisees' advisor for?\n--->\t";
     getline(cin, tempStrValue);
@@ -387,7 +553,6 @@ void Simulation::deleteFaculty(){
         return;
     }
 
-    GenLinkedList<unsigned int> replaceAdvisors = masterFaculty->find(Faculty(deletingFacultyId))->getAllAdvisees();
     for (int i = 0; i < replaceAdvisors.getSize(); ++i) {
         unsigned int tempId = *(replaceAdvisors.returnData(i));
         if (masterStudent->contains(Student(tempId))) {
@@ -397,8 +562,6 @@ void Simulation::deleteFaculty(){
     }
     masterFaculty->deleteNode(Faculty(deletingFacultyId));
     cout << "Success! Deleted faculty member with ID #" << to_string(deletingFacultyId) << " and transfered their advisees to faculty member with ID #" << to_string(newFacultyId) << endl;
-
-
     usleep(1000000);
 }
 
@@ -415,14 +578,13 @@ void Simulation::rollbackLastChange(){
 }
 
 void Simulation::saveAndQuit(){
-    cout << "Exiting program. Thank you." << endl;
+    cout << "Saving changes and exiting program. Thank you." << endl;
     usleep(500000);
 }
 
 unsigned int Simulation::getValidId(string s){
     try{
-        FileProcessor fp;
-        if (fp.isEmptyString(s)) {
+        if (FileProcessor::isEmptyString(s)) {
             throw runtime_error("ERROR: No value for ID provided.");
         }
         int tempId = stoi(s);
