@@ -51,6 +51,9 @@ class Simulation{
         BST<Student> *masterStudent;
         BST<Faculty> *masterFaculty;
 
+        // Rollback for all changes to BST
+        Rollback<string> *rb;
+
         // file names of the student file and faculty file
         string studentFile;
         string facultyFile;

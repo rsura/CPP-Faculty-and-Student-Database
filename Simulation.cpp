@@ -15,11 +15,13 @@ using namespace std;
 Simulation::Simulation(){
     masterStudent = new BST<Student>();
     masterFaculty = new BST<Faculty>();
+    rb = new Rollback<string>(5);
 }
 
 Simulation::~Simulation(){
     delete masterStudent;
     delete masterFaculty;
+    delete rb;
 }
 
 void Simulation::run(){
@@ -288,13 +290,16 @@ void Simulation::printFacultyAdvisees(){
     try{
         unsigned int referenceId = getValidId(tempStrValue);
         if (masterFaculty->contains(Faculty(referenceId))) {
+            GenLinkedList<unsigned int> advisees = masterFaculty->find(Faculty(referenceId))->getAllAdvisees();
+            if (advisees.getSize() == 0) {
+                throw runtime_error("This faculty member has no advisees. Nothing will be printed.");
+            }
             cout << "Printing info of all advisees of faculty member with ID #" << referenceId << endl;
             usleep(500000);
-            GenLinkedList<unsigned int> advisees = masterFaculty->find(Faculty(referenceId))->getAllAdvisees();
             for (int i = 0; i < advisees.getSize(); ++i) {
                 unsigned int studId = *(advisees.returnData(i));
-                if (masterStudent->contains(studId)) {
-                    cout << *(masterStudent->find(studId)) << endl;
+                if (masterStudent->contains(Student(studId))) {
+                    cout << *(masterStudent->find(Student(studId))) << endl;
                 } else {
                     masterFaculty->find(Faculty(referenceId))->removeAdvisee(studId);
                 }
@@ -406,6 +411,10 @@ void Simulation::addNewStudent(){
         cout << "Success! Added a new student with the following info:" << endl;
         cout << s1 << endl;
         masterFaculty->find(Faculty(newFacultyId))->addAdvisee(newStudId);
+        ostringstream os; // rollback stuff
+        os << "StudentDelete: ";
+        s1 >> os;
+        rb->push(os.str());
     } catch (exception &e){
         cerr << "ERROR: Something went wrong when trying to create a new faculty member." << endl;
     }
@@ -424,7 +433,12 @@ void Simulation::deleteStudent(){
     try{
         unsigned int referenceId = getValidId(tempStrValue);
         if (masterStudent->contains(Student(referenceId))) {
-            unsigned int studAdvisor = masterStudent->find(Student(referenceId))->getAdvisorId();
+            Student s1 = *(masterStudent->find(Student(referenceId)));
+            unsigned int studAdvisor = s1.getAdvisorId();
+            ostringstream os; // rollback stuff
+            os << "StudentAdd: ";
+            s1 >> os;
+            rb->push(os.str());
             masterStudent->deleteNode(Student(referenceId));
             cout << "Success! Deleted the student with ID #" << referenceId << endl;
             usleep(500000);
@@ -499,6 +513,10 @@ void Simulation::addNewFaculty(){
         masterFaculty->insert(f1);
         cout << "Success! Added a new faculty member with the following info:" << endl;
         cout << f1 << endl;
+        ostringstream os; // rollback stuff
+        os << "FacultyDelete: ";
+        f1 >> os;
+        rb->push(os.str());
     } catch (exception &e){
         cerr << "ERROR: Something went wrong when trying to create a new faculty member." << endl;
     }
@@ -530,6 +548,10 @@ void Simulation::deleteFaculty(){
 
     GenLinkedList<unsigned int> replaceAdvisors = masterFaculty->find(Faculty(deletingFacultyId))->getAllAdvisees();
     if (replaceAdvisors.getSize() == 0) {
+        ostringstream os; // rollback stuff
+        os << "FacultyAdd: ";
+        *(masterFaculty->find(Faculty(deletingFacultyId))) >> os;
+        rb->push(os.str());
         masterFaculty->deleteNode(Faculty(deletingFacultyId));
         cout << "Success! Deleted faculty member with ID #" << to_string(deletingFacultyId) << ". Since they have no dependent advisees, no students will be affected by this deletion." << endl;
         usleep(1000000);
@@ -559,10 +581,15 @@ void Simulation::deleteFaculty(){
     for (int i = 0; i < replaceAdvisors.getSize(); ++i) {
         unsigned int tempId = *(replaceAdvisors.returnData(i));
         if (masterStudent->contains(Student(tempId))) {
-            masterStudent->find(tempId)->setAdvisorId(newFacultyId);
-            masterFaculty->find(newFacultyId)->addAdvisee(tempId);
+            masterStudent->find(Student(tempId))->setAdvisorId(newFacultyId);
+            int tempAdvisorId = masterStudent->find(Student(tempId))->getAdvisorId();
+            masterFaculty->find(Faculty(tempAdvisorId))->addAdvisee(tempId);
         }
     }
+    ostringstream os; // rollback stuff
+    os << "FacultyAdd: ";
+    *(masterFaculty->find(Faculty(deletingFacultyId))) >> os;
+    rb->push(os.str());
     masterFaculty->deleteNode(Faculty(deletingFacultyId));
     cout << "Success! Deleted faculty member with ID #" << to_string(deletingFacultyId) << " and transfered their advisees to faculty member with ID #" << to_string(newFacultyId) << endl;
     usleep(1000000);
@@ -695,7 +722,43 @@ void Simulation::removeFacultyAdvisee(){
 }
 
 void Simulation::rollbackLastChange(){
-
+    if (rb->isEmpty()) {
+        cerr << "ERROR: Can't undo any more changes." << endl;
+        cerr << "Maxmimum number of consecutive undos at a time is 5, and if less than 5 changes to the database have been made so far, it can only undo those changes" << endl;
+        usleep(1000000);
+        return;
+    }
+    string instruction = rb->pop();
+    string operationType = FileProcessor::nextValueInString(instruction, ": ");
+    if (operationType == "StudentDelete") {
+        Student s1(instruction);
+        masterFaculty->find(Faculty(s1.getAdvisorId()))->removeAdvisee(s1.getId());
+        masterStudent->deleteNode(s1);
+        cout << "Successfully undid the change of adding a student with ID #" << s1.getId() << endl;
+    } else if (operationType == "StudentAdd") {
+        Student s1(instruction);
+        masterStudent->insert(s1);
+        masterFaculty->find(Faculty(s1.getAdvisorId()))->addAdvisee(s1.getId());
+        cout << "Successfully undid the change of deleting a student with ID #" << s1.getId() << endl;
+    } else if (operationType == "FacultyDelete"){
+        Faculty f1(instruction);
+        masterFaculty->deleteNode(f1);
+        cout << "Successfully undid the change of adding a faculty member with ID #" << f1.getId() << endl;
+    } else if (operationType == "FacultyAdd"){
+        Faculty f1(instruction);
+        GenLinkedList<unsigned int> adviseesToUndo = f1.getAllAdvisees();
+        masterFaculty->insert(f1);
+        if (!adviseesToUndo.isEmpty()) {
+            for (int i = 0; i < adviseesToUndo.getSize(); i++) {
+                unsigned int tempAdviseeId = *(adviseesToUndo.returnData(i));
+                unsigned int oldAdvisorId = masterStudent->find(Student(tempAdviseeId))->getAdvisorId();
+                masterFaculty->find(Faculty(oldAdvisorId))->removeAdvisee(tempAdviseeId);
+                masterStudent->find(Student(tempAdviseeId))->setAdvisorId(f1.getId());
+            }
+        }
+        cout << "Successfully undid the change of deleting a faculty member with ID #" << f1.getId() << endl;
+    }
+    usleep(1000000);
 }
 
 void Simulation::saveAndQuit(){
