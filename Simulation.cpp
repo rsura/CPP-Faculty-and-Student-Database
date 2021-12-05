@@ -32,6 +32,7 @@ void Simulation::run(){
         int optionNumber;
         if (FileProcessor::isEmptyString(selectedOption)) {
             cerr << "ERROR: No input. Instructions will be repeated again." << endl;
+            usleep(1000000);
             continue;
         } else {
             try{
@@ -85,6 +86,7 @@ void Simulation::run(){
                     break;
                 default:
                     cerr << "ERROR: Not a valid option number. Instructions will be repeated again." << endl;
+                    usleep(1000000);
                     break;
             }
         }
@@ -568,7 +570,7 @@ void Simulation::deleteFaculty(){
 
 void Simulation::changeStudAdvisor(){
     if (masterStudent->isEmpty()) {
-        cout << "Student database is empty. It wouldn't be possible to print change any student's advisor, because there are no students in the database." << endl;
+        cout << "Student database is empty. It wouldn't be possible to change any student's advisor, because there are no students in the database." << endl;
         usleep(1000000);
         return;
     }
@@ -613,7 +615,7 @@ void Simulation::changeStudAdvisor(){
     masterStudent->find(Student(studId))->setAdvisorId(newFacultyId);
     masterFaculty->find(Faculty(newFacultyId))->addAdvisee(studId);
 
-    if (masterFaculty->contains(Faculty(studCurrAdvisor))) {
+    if (masterFaculty->contains(Faculty(studCurrAdvisor))) { // in case the student has a bad faculty ID
         masterFaculty->find(Faculty(studCurrAdvisor))->removeAdvisee(studId);
     }
 
@@ -623,6 +625,72 @@ void Simulation::changeStudAdvisor(){
 }
 
 void Simulation::removeFacultyAdvisee(){
+    if (masterStudent->isEmpty()) {
+        cout << "Student database is empty, so it wouldn't be possible to remove any advisees from a given advisor" << endl;
+        usleep(1000000);
+        return;
+    }
+
+    string tempStrValue;
+    unsigned int facultyId;
+    unsigned int adviseeId;
+    unsigned int newFacultyId;
+
+    cout << "What is the ID of the faculty member that you would like to replace the student's advisor for?\n--->\t";
+    getline(cin, tempStrValue);
+    try{
+        facultyId = getValidId(tempStrValue);
+        if (!masterFaculty->contains(Faculty(facultyId))) {
+            throw runtime_error("ERROR: No faculty member found in the databse with the ID #" + to_string(facultyId));
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+
+    GenLinkedList<unsigned int> facAdvisees = masterFaculty->find(Faculty(facultyId))->getAllAdvisees();
+
+    cout << "What is the ID of the advisee for this faculty member that you would like to remove?\n--->\t";
+    getline(cin, tempStrValue);
+    try{
+        adviseeId = getValidId(tempStrValue);
+        if (!masterStudent->contains(Student(adviseeId))) {
+            throw runtime_error("ERROR: No student found in the database with the ID #" + to_string(adviseeId));
+        }
+        if (facAdvisees.find(adviseeId) < 0) {
+            throw runtime_error("ERROR: Faculty member with ID #" + to_string(facultyId) + " has no advisee (student) with ID #" + to_string(adviseeId));
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+
+    cout << "The advisee that was removed needs a new advisor as a replacement." << endl;
+    cout << "What is the ID of the advisee's new advisor (faculty member)?\n--->\t";
+    getline(cin, tempStrValue);
+    try{
+        newFacultyId = getValidId(tempStrValue);
+        if (!masterFaculty->contains(Faculty(newFacultyId))) {
+            throw runtime_error("ERROR: No faculty member found in the databse with the ID #" + to_string(newFacultyId));
+        }
+        if (newFacultyId == facultyId) {
+            throw runtime_error("ERROR: The two faculty IDs that you inputted are the same.");
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+
+    masterFaculty->find(Faculty(facultyId))->removeAdvisee(adviseeId);
+    masterStudent->find(Student(adviseeId))->setAdvisorId(newFacultyId);
+    masterFaculty->find(Faculty(newFacultyId))->addAdvisee(adviseeId);
+
+    cout << "Successfully removed student with ID #" << adviseeId << " from the advisee list of faculty member with ID #" << facultyId << endl;
+    cout << "The student got a new advisor with ID #" << newFacultyId << endl;
+    usleep(1000000);
 
 }
 
