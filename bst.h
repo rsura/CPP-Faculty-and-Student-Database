@@ -11,6 +11,7 @@
 #ifndef BST_H // header guards
 #define BST_H
 #include <iostream>
+#include "GenLinkedList.h"
 
 using namespace std;
 
@@ -74,10 +75,15 @@ class BST{
         T* getMin();
         T* getMax();
         void printNodes();
+        GenLinkedList<T*>* getPreOrderNodes();
     private:
+         // helper functions
         void recDelete(TreeNode<T> *node);
         void recPrint(TreeNode<T> *node);
+        void recPreOrderNodes(TreeNode<T> *node);
         TreeNode<T> *getSuccessor(TreeNode<T> *d); //d represents the node we are going to delete
+
+        GenLinkedList<T*> *nodesInPreOrder;
         TreeNode<T> *root;
 };
 
@@ -87,6 +93,7 @@ class BST{
 template <class T>
 BST<T>::BST(){
     root = NULL;
+    nodesInPreOrder = new GenLinkedList<T*>;
 }
 
 /**
@@ -97,6 +104,7 @@ BST<T>::~BST(){
     recDelete(root);
     root = NULL; // nulls out the root, in case it's not nulled out already, to indicate the tree is empty
     delete root;
+    delete nodesInPreOrder;
 }
 
 /**
@@ -141,6 +149,39 @@ void BST<T>::recPrint(TreeNode<T> *node){ // inorder printing
 template <class T>
 void BST<T>::printNodes(){
     recPrint(root); // printing inorder with the helper function
+}
+
+/**
+ * Helper function - recursively adds constant references to values of the BST
+ * from a certain node preorder, but used by the getPreOrderNodes() method to
+ * get the values of the BST preorder into a linked list, so that it can be saved
+ * and written back to the BST in the same way again.
+ *
+ * @param a linked list of constant pointers
+ */
+template <class T>
+void BST<T>::recPreOrderNodes(TreeNode<T> *node){
+    if(node == NULL){
+        return;
+    }
+    nodesInPreOrder->insertBack(&(node->key));
+    recPreOrderNodes(node->left);
+    recPreOrderNodes(node->right);
+}
+
+/**
+ * Gets the values of the BST preorder into a linked list, so that it can be saved
+ * and written back to the BST in the same way again.
+ *
+ * @return a linked list of constant pointers
+ */
+template <class T>
+GenLinkedList<T*>* BST<T>::getPreOrderNodes(){
+    while (!nodesInPreOrder->isEmpty()) {
+        nodesInPreOrder->removeFront();
+    }
+    recPreOrderNodes(root);
+    return nodesInPreOrder;
 }
 
 /**
