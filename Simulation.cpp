@@ -544,7 +544,7 @@ void Simulation::deleteFaculty(){
             throw runtime_error("ERROR: The two faculty IDs that you inputted are the same.");
         }
         if (!masterFaculty->contains(Faculty(newFacultyId))) {
-            string s = "ERROR: No faculty member found in the databse with the ID: \"" + to_string(newFacultyId) + "\" to replace faculty member with ID#" + to_string(deletingFacultyId);
+            string s = "ERROR: No faculty member found in the databse with the ID #" + to_string(newFacultyId) + " to replace faculty member with ID #" + to_string(deletingFacultyId);
             s += "\nWill not delete Faculty member with ID #" + to_string(deletingFacultyId);
             throw runtime_error(s);
         }
@@ -567,7 +567,59 @@ void Simulation::deleteFaculty(){
 }
 
 void Simulation::changeStudAdvisor(){
+    if (masterStudent->isEmpty()) {
+        cout << "Student database is empty. It wouldn't be possible to print change any student's advisor, because there are no students in the database." << endl;
+        usleep(1000000);
+        return;
+    }
 
+    unsigned int studId;
+    unsigned int studCurrAdvisor;
+    unsigned int newFacultyId;
+
+    cout << "What is the ID of the student who you would like to change advisor for?\n--->\t";
+    string tempStrValue;
+    getline(cin, tempStrValue);
+    try{
+        studId = getValidId(tempStrValue);
+        if (!masterStudent->contains(Student(studId))) {
+            throw runtime_error("ERROR: No student found with the ID #" + to_string(studId));
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+    studCurrAdvisor = masterStudent->find(Student(studId))->getAdvisorId();
+    cout << "Student with ID #" << studId << " currently has an advisor with ID #" << studCurrAdvisor << endl;
+
+    cout << "What is the ID of the faculty member that you would like to replace the student's advisor for?\n--->\t";
+    getline(cin, tempStrValue);
+    try{
+        newFacultyId = getValidId(tempStrValue);
+        if (studCurrAdvisor == newFacultyId) {
+            throw runtime_error("ERROR: The two faculty IDs that you inputted are the same.");
+        }
+        if (!masterFaculty->contains(Faculty(newFacultyId))) {
+            string s = "ERROR: No faculty member found in the databse with the ID #" + to_string(newFacultyId); + "\" to replace faculty member with ID #" + to_string(studCurrAdvisor);
+            throw runtime_error(s);
+        }
+    } catch (runtime_error &e){
+        cerr << e.what() << endl;
+        usleep(1000000);
+        return;
+    }
+
+    masterStudent->find(Student(studId))->setAdvisorId(newFacultyId);
+    masterFaculty->find(Faculty(newFacultyId))->addAdvisee(studId);
+
+    if (masterFaculty->contains(Faculty(studCurrAdvisor))) {
+        masterFaculty->find(Faculty(studCurrAdvisor))->removeAdvisee(studId);
+    }
+
+    cout << "Successfully changed the advisor for student with ID #" << studId << " to the advisor with ID #" << newFacultyId << endl;
+
+    usleep(1000000);
 }
 
 void Simulation::removeFacultyAdvisee(){
