@@ -30,6 +30,7 @@ void Simulation::run(){
     while(!exit){
         displayOptions();
         string selectedOption;
+        string validation;
         getline(cin, selectedOption);
         int optionNumber;
         if (FileProcessor::isEmptyString(selectedOption)) {
@@ -84,7 +85,19 @@ void Simulation::run(){
                     rollbackLastChange();
                     break;
                 case 14:
+                    saveAndQuit();
                     exit = true;
+                    break;
+                case 99:
+                    cout << "Are you sure you want to quit without saving changes? Type \"YES\" in all CAPS to confirm this, or type anything else to continue the program.\n--->\t";
+                    getline(cin, validation);
+                    if (validation == "YES") {
+                        exit = true;
+                        cout << "Exiting the program without saving changes..." << endl;
+                    } else {
+                        cout << "Continuing the program. Your changes to the database are still intact." << endl;
+                    }
+                    usleep(1000000);
                     break;
                 default:
                     cerr << "ERROR: Not a valid option number. Instructions will be repeated again." << endl;
@@ -93,7 +106,6 @@ void Simulation::run(){
             }
         }
     }
-    saveAndQuit();
 }
 
 void Simulation::setUp(){
@@ -175,10 +187,10 @@ void Simulation::displayOptions(){
     usleep(pauseTimeBtwn);
     cout << "\t14. Save and quit" << endl;
     usleep(pauseTimeBtwn);
+    cout << "\t99. Quit without saving changes" << endl;
+    usleep(pauseTimeBtwn);
     cout << "Please type the number corresponding to the option that you would like to choose:" << endl;
-    usleep(pauseTimeBtwn);
     cout << "--->\t";
-    usleep(pauseTimeBtwn);
 }
 
 void Simulation::printAllStudents(){
@@ -762,8 +774,28 @@ void Simulation::rollbackLastChange(){
 }
 
 void Simulation::saveAndQuit(){
+    FileProcessor *fp = new FileProcessor();
+
+    GenLinkedList<Student*>* saveStudents = masterStudent->getPreOrderNodes();
+    ostringstream studentsFile;
+    for (int i = 0; i < saveStudents->getSize(); i++) {
+        *(saveStudents->returnData(i)) >> studentsFile;
+    }
+    fp->setWriteFileName("studentTable");
+    fp->write(studentsFile.str());
+
+    GenLinkedList<Faculty*>* saveFaculty = masterFaculty->getPreOrderNodes();
+    ostringstream facultyFile;
+    for (int i = 0; i < saveFaculty->getSize(); i++) {
+        *(saveFaculty->returnData(i)) >> facultyFile;
+    }
+    fp->setWriteFileName("facultyTable");
+    fp->write(facultyFile.str());
+
+    delete fp;
+
     cout << "Saving changes and exiting program. Thank you." << endl;
-    usleep(500000);
+    usleep(1000000);
 }
 
 unsigned int Simulation::getValidId(string s){
